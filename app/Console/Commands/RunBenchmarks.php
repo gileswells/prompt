@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Services\BenchmarkService;
+use App\Factories\BenchmarkOutputFactory;
 
 class RunBenchmarks extends Command
 {
@@ -121,11 +122,9 @@ class RunBenchmarks extends Command
 
         $calculated = BenchmarkService::calculateResults($results, $this->functionNames, $sort, $direction);
 
-        // Output results as table
-        $this->info('Test Results for ' . $count . ' itterations on ' . implode(', ', $functions) . '.');
-        $this->info('Sorted by: ' . $sort . ' - ' . $direction);
-        $headers = ['', 'min', 'max', 'average'];
-        $this->table($headers, $calculated);
+        $outputType = $this->choice('What output format would you like?', ['print', 'csv'], 0);
+        $outputFactory = BenchmarkOutputFactory::getFactory($outputType);
+        $outputFactory->output($this, $calculated, $functions, $count, $sort, $direction);
     }
 
     /**

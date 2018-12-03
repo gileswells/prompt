@@ -16,7 +16,7 @@ class BenchmarkService {
      *
      * @return array
      */
-    public static function run(callable $function, $params, $count)
+    public static function run(callable $function, $params, $count) : array
     {
         $output = [];
         for ($i = 0; $i < $count; $i ++) {
@@ -39,9 +39,9 @@ class BenchmarkService {
      * @param  string $sort          Which field to sort by
      * @param  string $direction     Sort direction
      *
-     * @return [type]
+     * @return array
      */
-    public static function calculateResults(array $results, $functionNames, $sort = 'average', $direction = 'asc')
+    public static function calculateResults(array $results, $functionNames, $sort = 'average', $direction = 'asc') : array
     {
         if (empty($results)) {
             return [];
