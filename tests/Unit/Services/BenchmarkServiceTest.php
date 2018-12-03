@@ -8,6 +8,8 @@ use App\Services\BenchmarkService;
 class BenchmarkServiceTest extends TestCase
 {
     /**
+     * Test formatting and calculating of benchmark results
+     *
      * @dataProvider calculateResultsDataProvider
      */
     public function testCalculateResults($expected, $results, $functionNames, $sort, $order)
@@ -47,6 +49,26 @@ class BenchmarkServiceTest extends TestCase
         );
     }
 
+    public function testCalculateResultsFunctionMissingException()
+    {
+        $this->expectException(\App\Exceptions\MissingFunctionNameException::class);
+
+        $dummy = [
+            'slowSort' => [1, 6, 5],
+        ];
+        $functionNames = [
+            'bubbleSort' => 'Bubble Sort',
+            'quickSort' => 'Quick Sort',
+        ];
+
+        BenchmarkService::calculateResults(
+            $dummy,
+            $functionNames,
+            'average',
+            'asc'
+        );
+    }
+
     /**
      * Data Provider for sorting of results
      *
@@ -55,6 +77,7 @@ class BenchmarkServiceTest extends TestCase
     public function calculateResultsDataProvider()
     {
         return [
+            // Test with empty result set
             'empty-data' => [
                 [],
                 [],
@@ -65,6 +88,7 @@ class BenchmarkServiceTest extends TestCase
                 null,
                 null,
             ],
+            // Test against only a single method
             'single-function' => [
                 [
                     'bubbleSort' => [
@@ -84,6 +108,7 @@ class BenchmarkServiceTest extends TestCase
                 'average',
                 'asc',
             ],
+            // Tests average ascending
             'average' => [
                 [
                     'quickSort' => [
@@ -110,6 +135,7 @@ class BenchmarkServiceTest extends TestCase
                 'average',
                 'asc',
             ],
+            // Tests average descending
             'average-descending' => [
                 [
                     'bubbleSort' => [
@@ -136,6 +162,7 @@ class BenchmarkServiceTest extends TestCase
                 'average',
                 'desc',
             ],
+            // Tests name ascending
             'name' => [
                 [
                     'bubbleSort' => [
@@ -162,6 +189,7 @@ class BenchmarkServiceTest extends TestCase
                 'name',
                 'asc',
             ],
+            // Texts name descending
             'name-descending' => [
                 [
                     'quickSort' => [
@@ -188,6 +216,7 @@ class BenchmarkServiceTest extends TestCase
                 'name',
                 'desc',
             ],
+            // Tests min ascending
             'min' => [
                 [
                     'bubbleSort' => [
@@ -214,6 +243,7 @@ class BenchmarkServiceTest extends TestCase
                 'min',
                 'asc',
             ],
+            // Texts min descending
             'min-descending' => [
                 [
                     'quickSort' => [
@@ -240,6 +270,7 @@ class BenchmarkServiceTest extends TestCase
                 'min',
                 'desc',
             ],
+            // Tests max ascending
             'max' => [
                 [
                     'quickSort' => [
@@ -266,6 +297,7 @@ class BenchmarkServiceTest extends TestCase
                 'max',
                 'asc',
             ],
+            // Texts max descending
             'max-descending' => [
                 [
                     'bubbleSort' => [

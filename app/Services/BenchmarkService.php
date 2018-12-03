@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\InvalidSortException;
 use App\Exceptions\InvalidOrderException;
+use App\Exceptions\MissingFunctionNameException;
 
 class BenchmarkService {
 
@@ -19,6 +20,7 @@ class BenchmarkService {
     {
         $output = [];
         for ($i = 0; $i < $count; $i ++) {
+            // @TODO mock out microtime to allow or predictable results for this method while unit testing
             $start = microtime(true);
             $function($params);
             $end = microtime(true);
@@ -54,6 +56,11 @@ class BenchmarkService {
         $descending = ($direction !== 'asc');
 
         $calculated = collect($results)
+            ->each(function ($values, $key) use ($functionNames) {
+                if (!isset($functionNames[$key])) {
+                    throw new MissingFunctionNameException($key . ' does not have a matching function name');
+                }
+            })
             ->map(function ($values, $key) use ($functionNames) {
                 $item = [
                     'name' => $functionNames[$key],
