@@ -10,9 +10,14 @@ class BenchmarkServiceTest extends TestCase
     /**
      * @dataProvider calculateResultsDataProvider
      */
-    public function testCalculateResults($expected, $results, $sort, $order)
+    public function testCalculateResults($expected, $results, $functionNames, $sort, $order)
     {
-        $actual = BenchmarkService::calculateResults($results, $sort, $order);
+        $actual = BenchmarkService::calculateResults(
+            $results,
+            $functionNames,
+            $sort,
+            $order
+        );
 
         $this->assertEquals($expected, $actual);
     }
@@ -24,7 +29,7 @@ class BenchmarkServiceTest extends TestCase
      *
      * @return void
      */
-    public function testCalculateResultsExceptions($exception, $sort, $order)
+    public function testCalculateResultsExceptions($exception, $functionNames, $sort, $order)
     {
         $this->expectException($exception);
 
@@ -34,7 +39,12 @@ class BenchmarkServiceTest extends TestCase
             ],
         ];
 
-        BenchmarkService::calculateResults($dummy, $sort, $order);
+        BenchmarkService::calculateResults(
+            $dummy,
+            $functionNames,
+            $sort,
+            $order
+        );
     }
 
     /**
@@ -48,17 +58,42 @@ class BenchmarkServiceTest extends TestCase
             'empty-data' => [
                 [],
                 [],
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
+                ],
                 null,
                 null,
+            ],
+            'single-function' => [
+                [
+                    'bubbleSort' => [
+                        'name' => 'Bubble Sort',
+                        'min' => 1,
+                        'max' => 6,
+                        'average' => 4,
+                    ],
+                ],
+                [
+                    'bubbleSort' => [1, 6, 5],
+                ],
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
+                ],
+                'average',
+                'asc',
             ],
             'average' => [
                 [
                     'quickSort' => [
+                        'name' => 'Quick Sort',
                         'min' => 2,
                         'max' => 4,
                         'average' => 3,
                     ],
                     'bubbleSort' => [
+                        'name' => 'Bubble Sort',
                         'min' => 1,
                         'max' => 6,
                         'average' => 4,
@@ -67,6 +102,10 @@ class BenchmarkServiceTest extends TestCase
                 [
                     'bubbleSort' => [1, 6, 5],
                     'quickSort' => [2, 4, 3, 3],
+                ],
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
                 ],
                 'average',
                 'asc',
@@ -74,11 +113,13 @@ class BenchmarkServiceTest extends TestCase
             'average-descending' => [
                 [
                     'bubbleSort' => [
+                        'name' => 'Bubble Sort',
                         'min' => 1,
                         'max' => 6,
                         'average' => 4,
                     ],
                     'quickSort' => [
+                        'name' => 'Quick Sort',
                         'min' => 2,
                         'max' => 4,
                         'average' => 3,
@@ -88,17 +129,75 @@ class BenchmarkServiceTest extends TestCase
                     'bubbleSort' => [1, 6, 5],
                     'quickSort' => [2, 4, 3, 3],
                 ],
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
+                ],
                 'average',
+                'desc',
+            ],
+            'name' => [
+                [
+                    'bubbleSort' => [
+                        'name' => 'Bubble Sort',
+                        'min' => 1,
+                        'max' => 6,
+                        'average' => 4,
+                    ],
+                    'quickSort' => [
+                        'name' => 'Quick Sort',
+                        'min' => 2,
+                        'max' => 4,
+                        'average' => 3,
+                    ],
+                ],
+                [
+                    'bubbleSort' => [1, 6, 5],
+                    'quickSort' => [2, 4, 3, 3],
+                ],
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
+                ],
+                'name',
+                'asc',
+            ],
+            'name-descending' => [
+                [
+                    'quickSort' => [
+                        'name' => 'Quick Sort',
+                        'min' => 2,
+                        'max' => 4,
+                        'average' => 3,
+                    ],
+                    'bubbleSort' => [
+                        'name' => 'Bubble Sort',
+                        'min' => 1,
+                        'max' => 6,
+                        'average' => 4,
+                    ],
+                ],
+                [
+                    'bubbleSort' => [1, 6, 5],
+                    'quickSort' => [2, 4, 3, 3],
+                ],
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
+                ],
+                'name',
                 'desc',
             ],
             'min' => [
                 [
                     'bubbleSort' => [
+                        'name' => 'Bubble Sort',
                         'min' => 1,
                         'max' => 6,
                         'average' => 4,
                     ],
                     'quickSort' => [
+                        'name' => 'Quick Sort',
                         'min' => 2,
                         'max' => 4,
                         'average' => 3,
@@ -107,6 +206,10 @@ class BenchmarkServiceTest extends TestCase
                 [
                     'bubbleSort' => [1, 6, 5],
                     'quickSort' => [2, 4, 3, 3],
+                ],
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
                 ],
                 'min',
                 'asc',
@@ -114,11 +217,13 @@ class BenchmarkServiceTest extends TestCase
             'min-descending' => [
                 [
                     'quickSort' => [
+                        'name' => 'Quick Sort',
                         'min' => 2,
                         'max' => 4,
                         'average' => 3,
                     ],
                     'bubbleSort' => [
+                        'name' => 'Bubble Sort',
                         'min' => 1,
                         'max' => 6,
                         'average' => 4,
@@ -127,6 +232,10 @@ class BenchmarkServiceTest extends TestCase
                 [
                     'bubbleSort' => [1, 6, 5],
                     'quickSort' => [2, 4, 3, 3],
+                ],
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
                 ],
                 'min',
                 'desc',
@@ -134,11 +243,13 @@ class BenchmarkServiceTest extends TestCase
             'max' => [
                 [
                     'quickSort' => [
+                        'name' => 'Quick Sort',
                         'min' => 2,
                         'max' => 4,
                         'average' => 3,
                     ],
                     'bubbleSort' => [
+                        'name' => 'Bubble Sort',
                         'min' => 1,
                         'max' => 6,
                         'average' => 4,
@@ -147,6 +258,10 @@ class BenchmarkServiceTest extends TestCase
                 [
                     'bubbleSort' => [1, 6, 5],
                     'quickSort' => [2, 4, 3, 3],
+                ],
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
                 ],
                 'max',
                 'asc',
@@ -154,11 +269,13 @@ class BenchmarkServiceTest extends TestCase
             'max-descending' => [
                 [
                     'bubbleSort' => [
+                        'name' => 'Bubble Sort',
                         'min' => 1,
                         'max' => 6,
                         'average' => 4,
                     ],
                     'quickSort' => [
+                        'name' => 'Quick Sort',
                         'min' => 2,
                         'max' => 4,
                         'average' => 3,
@@ -167,6 +284,10 @@ class BenchmarkServiceTest extends TestCase
                 [
                     'bubbleSort' => [1, 6, 5],
                     'quickSort' => [2, 4, 3, 3],
+                ],
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
                 ],
                 'max',
                 'desc',
@@ -184,11 +305,19 @@ class BenchmarkServiceTest extends TestCase
         return [
             [
                 \App\Exceptions\InvalidSortException::class,
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
+                ],
                 'invalid-option',
                 'asc',
             ],
             [
                 \App\Exceptions\InvalidOrderException::class,
+                [
+                    'bubbleSort' => 'Bubble Sort',
+                    'quickSort' => 'Quick Sort',
+                ],
                 'min',
                 'invalid-option',
             ],

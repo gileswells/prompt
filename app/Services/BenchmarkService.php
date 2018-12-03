@@ -32,18 +32,19 @@ class BenchmarkService {
     /**
      * Take in the benchmark raw data and format the data in a more logical format
      *
-     * @param  array  $result    Raw result data from to be calculated and compared
-     * @param  string $sort      Which field to sort by
-     * @param  string $direction Sort direction
+     * @param  array  $result        Raw result data from to be calculated and compared
+     * @param  array  $functionNames Human readable function names
+     * @param  string $sort          Which field to sort by
+     * @param  string $direction     Sort direction
      *
      * @return [type]
      */
-    public static function calculateResults(array $results, $sort = 'average', $direction = 'asc')
+    public static function calculateResults(array $results, $functionNames, $sort = 'average', $direction = 'asc')
     {
         if (empty($results)) {
             return [];
         }
-        if (!in_array($sort, ['min', 'max', 'average'])) {
+        if (!in_array($sort, ['name', 'min', 'max', 'average'])) {
             throw new InvalidSortException($sort . ' is not a valid sort field');
         }
         if (!in_array($direction, ['asc', 'desc'])) {
@@ -53,8 +54,9 @@ class BenchmarkService {
         $descending = ($direction !== 'asc');
 
         $calculated = collect($results)
-            ->map(function ($values, $key) {
+            ->map(function ($values, $key) use ($functionNames) {
                 $item = [
+                    'name' => $functionNames[$key],
                     'min' => min($values),
                     'max' => max($values),
                     'average' => array_sum($values) / count($values),

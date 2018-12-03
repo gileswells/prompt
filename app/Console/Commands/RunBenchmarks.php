@@ -106,15 +106,21 @@ class RunBenchmarks extends Command
         $results = [];
 
         foreach ($functions as $func) {
-            $testResult = BenchmarkService::run([$this, $func], $this->dummyArray, $count);
+            // @TODO move this into a factory vs testing methods only off of this class
+            $testResult = BenchmarkService::run(
+                [$this, $func],
+                $this->dummyArray,
+                $count
+            );
 
             $results[$func] = $testResult;
         }
 
-        $calculated = BenchmarkService::calculateResults($results);
-        // $calculated = BenchmarkService::calculateResults($results, 'min', 'desc');
+        $calculated = BenchmarkService::calculateResults($results, $this->functionNames);
+        // $calculated = BenchmarkService::calculateResults($results, $this->functionNames, 'min', 'desc');
 
-        dd($calculated);
+        $headers = ['', 'min', 'max', 'average'];
+        $this->table($headers, $calculated);
     }
 
     /**
