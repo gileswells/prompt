@@ -116,9 +116,14 @@ class RunBenchmarks extends Command
             $results[$func] = $testResult;
         }
 
-        $calculated = BenchmarkService::calculateResults($results, $this->functionNames);
-        // $calculated = BenchmarkService::calculateResults($results, $this->functionNames, 'min', 'desc');
+        $sort = $this->choice('How would you like the results sorted?', ['average', 'min', 'max'], 0);
+        $direction = $this->choice('How would you like the results ordered?', ['asc', 'desc'], 0);
 
+        $calculated = BenchmarkService::calculateResults($results, $this->functionNames, $sort, $direction);
+
+        // Output results as table
+        $this->info('Test Results for ' . $count . ' itterations on ' . implode(', ', $functions) . '.');
+        $this->info('Sorted by: ' . $sort . ' - ' . $direction);
         $headers = ['', 'min', 'max', 'average'];
         $this->table($headers, $calculated);
     }
