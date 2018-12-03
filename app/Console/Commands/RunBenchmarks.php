@@ -112,6 +112,7 @@ class RunBenchmarks extends Command
         }
 
         $calculated = BenchmarkService::calculateResults($results);
+        // $calculated = BenchmarkService::calculateResults($results, 'min', 'desc');
 
         dd($calculated);
     }

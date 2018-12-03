@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Exceptions\InvalidSortException;
+use App\Exceptions\InvalidOrderException;
+
 class BenchmarkService {
 
     /**
@@ -29,7 +32,9 @@ class BenchmarkService {
     /**
      * Take in the benchmark raw data and format the data in a more logical format
      *
-     * @param  array $result Raw result data from to be calculated and compared
+     * @param  array  $result    Raw result data from to be calculated and compared
+     * @param  string $sort      Which field to sort by
+     * @param  string $direction Sort direction
      *
      * @return [type]
      */
@@ -38,15 +43,27 @@ class BenchmarkService {
         if (empty($results)) {
             return [];
         }
-
-        $calculated = [];
-        foreach ($results as $key => $values) {
-            $calculated[$key] = [
-                'min' => min($values),
-                'max' => max($values),
-                'average' => array_sum($values) / count($values),
-            ];
+        if (!in_array($sort, ['min', 'max', 'average'])) {
+            throw new InvalidSortException($sort . ' is not a valid sort field');
         }
+        if (!in_array($direction, ['asc', 'desc'])) {
+            throw new InvalidOrderException($direction . ' is not a valid ordering direction');
+        }
+
+        $descending = ($direction !== 'asc');
+
+        $calculated = collect($results)
+            ->map(function ($values, $key) {
+                $item = [
+                    'min' => min($values),
+                    'max' => max($values),
+                    'average' => array_sum($values) / count($values),
+                ];
+
+                return $item;
+            })
+            ->sortBy($sort, SORT_REGULAR, $descending)
+            ->toArray();
 
         return $calculated;
     }
